@@ -1,7 +1,7 @@
 // sw.js — Service Worker：离线缓存（cache-first）
 // iOS 上「添加到主屏幕」+ 本 SW = 可安装的 PWA；通知能力需要 iOS 16.4+。
 
-const CACHE = 'focus-grove-v4';
+const CACHE = 'focus-grove-v5';
 const ASSETS = [
   './',
   'index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   'css/styles.css',
   'js/storage.js', 'js/timer.js', 'js/tree.js', 'js/stats.js', 'js/blocklist.js', 'js/app.js',
   'assets/icon-192.png', 'assets/icon-512.png', 'assets/apple-touch-icon.png',
+  'assets/tree-oak.svg', 'assets/tree-sakura.svg', 'assets/tree-pine.svg', 'assets/tree-maple.svg', 'assets/tree-wisteria.svg',
 ];
 
 self.addEventListener('install', (e) => {

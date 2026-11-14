@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
+  <!-- Focus Grove original artwork: wisteria (flat layered-canopy style with hanging blooms) -->
+  <defs>
+    <radialGradient id="wisL1" cx="42%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#a184d0"/><stop offset="100%" stop-color="#8463b4"/>
+    </radialGradient>
+    <radialGradient id="wisL2" cx="45%" cy="28%" r="85%">
+      <stop offset="0%" stop-color="#b39ade"/><stop offset="100%" stop-color="#9677c4"/>
+    </radialGradient>
+    <radialGradient id="wisL3" cx="45%" cy="30%" r="85%">
+      <stop offset="0%" stop-color="#cdb6ea"/><stop offset="100%" stop-color="#ab8dd6"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="100" cy="226" rx="54" ry="10" fill="#5a4468" opacity="0.18"/>
+  <rect x="91" y="168" width="18" height="56" rx="8" fill="#6a5340"/>
+  <rect x="94.5" y="168" width="6" height="56" rx="3" fill="#7f664f" opacity="0.85"/>
+  <!-- 下垂花串 -->
+  <g fill="#b69ae0">
+    <circle cx="62" cy="178" r="10"/><circle cx="62" cy="194" r="8"/><circle cx="62" cy="206" r="6"/>
+    <circle cx="138" cy="178" r="10"/><circle cx="138" cy="194" r="8"/><circle cx="138" cy="206" r="6"/>
+  </g>
+  <g fill="#d4c2ee">
+    <circle cx="100" cy="184" r="11"/><circle cx="100" cy="200" r="8.5"/><circle cx="100" cy="212" r="6.5"/>
+  </g>
+  <circle cx="56" cy="146" r="40" fill="url(#wisL1)"/>
+  <circle cx="144" cy="146" r="40" fill="url(#wisL1)"/>
+  <circle cx="100" cy="122" r="62" fill="url(#wisL2)"/>
+  <circle cx="80" cy="92" r="46" fill="url(#wisL3)"/>
+  <circle cx="122" cy="98" r="40" fill="url(#wisL2)"/>
+  <circle cx="78" cy="78" r="14" fill="#e3d3f6" opacity="0.9"/>
+  <circle cx="104" cy="62" r="8" fill="#e3d3f6" opacity="0.6"/>
+</svg>

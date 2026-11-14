@@ -1,12 +1,11 @@
 // app.js — 主逻辑：视图路由、种植流程、拦截监控、通知、统计渲染
 import { Storage } from './storage.js';
 import { TimerEngine, DIE } from './timer.js';
-import { drawTree, drawMiniTree, TREE_TYPES } from './tree.js';
+import { TREE_TYPES, treeSrc, treeName } from './tree.js';
 import { Stats } from './stats.js';
 import { Blocklist } from './blocklist.js';
 
 const $ = (id) => document.getElementById(id);
-let rafHandle = null;
 
 /* ---------- 视图路由 ---------- */
 function showView(name) {
@@ -80,24 +79,15 @@ function refreshTopChips() {
   $('chip-coins').textContent = `🪙 ${Storage.getCoins()}`;
 }
 
-function paintTree(session) {
-  const canvas = $('tree-canvas');
-  const inGrace = session && session.graceDeadline;
-  drawTree(canvas, {
-    seed: session?.id ?? 'idle-tree',
-    type: session?.treeType ?? setup.treeType,
-    progress: session ? session.progress() : 0.06,
-    dead: false,
-  });
-  if (!rafHandle && session) {
-    const loop = () => {
-      const s = TimerEngine.current;
-      if (s && s.status === 'growing') { paintTree(s); rafHandle = requestAnimationFrame(loop); }
-      else rafHandle = null;
-    };
-    rafHandle = requestAnimationFrame(loop);
-  }
-  void inGrace;
+/* ---------- 树贴图渲染（静态，无成长动画） ---------- */
+// state: 'idle'（种植前预览，半透明）| 'growing'（专注中完整显示）| 'dead'（枯树滤镜）
+function renderTree(session, state) {
+  const img = $('tree-img');
+  const type = session?.treeType ?? setup.treeType;
+  img.src = treeSrc(type);
+  img.alt = `${treeName(type)}（原创贴图）`;
+  img.classList.toggle('idle', state === 'idle');
+  img.classList.toggle('tree-dead', state === 'dead');
 }
 
 /* ---------- 种植流程 ---------- */
@@ -132,8 +122,8 @@ async function startPlanting() {
   );
   session.persist();
   enterGrowingUI(session);
-  notify('🌱 种树开始', `这棵${TREE_TYPES.find(t => t.id === session.treeType)?.name}正在生长，加油！`, 'start');
-  paintTree(session);
+  notify('🌱 种树开始', `这棵${treeName(session.treeType)}正在生长，加油！`, 'start');
+  renderTree(session, 'growing');
 }
 
 function enterGrowingUI(session) {
@@ -190,8 +180,6 @@ function onTick(session) {
 }
 
 function onEnded(record) {
-  rafHandle ??= null;
-  if (rafHandle) { cancelAnimationFrame(rafHandle); rafHandle = null; }
   $('grace-banner').classList.add('hidden');
 
   let coins = 0;
@@ -208,7 +196,7 @@ function onEnded(record) {
   $('setup-panel').classList.remove('hidden');
   $('growing-panel').classList.add('hidden');
   $('progress-ring-label').textContent = '准备好了就种下这棵树';
-  paintTree(null);
+  renderTree(null, 'idle');
   refreshTopChips();
 
   const tName = TREE_TYPES.find(t => t.id === record.treeType)?.name ?? '树';
@@ -277,15 +265,18 @@ function renderForest() {
   for (const s of [...sessions].reverse().slice(0, 60)) {
     const div = document.createElement('div');
     div.className = 'forest-item';
-    const c = document.createElement('canvas');
-    div.appendChild(c);
+    const img = document.createElement('img');
+    img.src = treeSrc(s.treeType);
+    img.alt = treeName(s.treeType);
+    img.draggable = false;
+    if (s.status !== 'done') img.classList.add('tree-dead');
+    div.appendChild(img);
     const meta = document.createElement('div');
     meta.className = 'meta';
     const d = new Date(s.endedAt);
-    meta.textContent = `${TREE_TYPES.find(t => t.id === s.treeType)?.name ?? '?'} · ${d.getMonth() + 1}/${d.getDate()}${s.status !== 'done' ? ' · 枯' : ''}`;
+    meta.textContent = `${treeName(s.treeType)} · ${d.getMonth() + 1}/${d.getDate()}${s.status !== 'done' ? ' · 枯' : ''}`;
     div.appendChild(meta);
     grid.appendChild(div);
-    requestAnimationFrame(() => drawMiniTree(c, { seed: s.id, type: s.treeType, dead: s.status !== 'done' }));
   }
 }
 
@@ -429,17 +420,14 @@ function init() {
   rebuildTagButtons();
   renderSetup();
   refreshTopChips();
-  paintTree(null);
+  renderTree(null, 'idle');
 
   // 恢复进行中的会话（页面刷新/被杀后重开）
   const resumed = TimerEngine.resume({ onTick, onEnded });
   if (resumed) {
     enterGrowingUI(resumed);
-    paintTree(resumed);
+    renderTree(resumed, 'growing');
   }
-  window.addEventListener('resize', () => {
-    const s = TimerEngine.current;
-    paintTree(s ?? null);
-  });
+  // 静态贴图随 object-fit 自适应，无需 resize 重绘
 }
 init();

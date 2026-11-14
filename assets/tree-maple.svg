@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="200" height="240">
+  <!-- Focus Grove original artwork: maple (flat layered-canopy style) -->
+  <defs>
+    <radialGradient id="mapL1" cx="42%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#e0703d"/><stop offset="100%" stop-color="#c25430"/>
+    </radialGradient>
+    <radialGradient id="mapL2" cx="45%" cy="28%" r="85%">
+      <stop offset="0%" stop-color="#ef8a50"/><stop offset="100%" stop-color="#d6623a"/>
+    </radialGradient>
+    <radialGradient id="mapL3" cx="45%" cy="30%" r="85%">
+      <stop offset="0%" stop-color="#f8a468"/><stop offset="100%" stop-color="#e57c48"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="100" cy="226" rx="54" ry="10" fill="#7a4a2e" opacity="0.18"/>
+  <rect x="91" y="168" width="18" height="56" rx="8" fill="#6d4230"/>
+  <rect x="94.5" y="168" width="6" height="56" rx="3" fill="#825440" opacity="0.85"/>
+  <circle cx="56" cy="146" r="40" fill="url(#mapL1)"/>
+  <circle cx="144" cy="146" r="40" fill="url(#mapL1)"/>
+  <circle cx="100" cy="124" r="62" fill="url(#mapL2)"/>
+  <circle cx="80" cy="94" r="46" fill="url(#mapL3)"/>
+  <circle cx="122" cy="100" r="40" fill="url(#mapL2)"/>
+  <!-- 飘落的枫叶点 -->
+  <g fill="#f2a25c">
+    <circle cx="34" cy="176" r="4.5"/><circle cx="168" cy="168" r="4"/>
+    <circle cx="150" cy="196" r="4"/><circle cx="48" cy="198" r="3.5"/>
+  </g>
+  <g fill="#ffd9a8">
+    <circle cx="78" cy="80" r="12" opacity="0.85"/><circle cx="104" cy="64" r="7" opacity="0.6"/>
+  </g>
+</svg>
