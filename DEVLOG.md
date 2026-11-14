@@ -28,6 +28,14 @@
 - **修复**：标签按钮只由 `rebuildTagButtons()` 构建，`renderSetup()` 只刷选中态。
 - **规则沉淀**：同一批 DOM 按钮**只允许一个构建者**；渲染函数只负责「按状态刷 selected 类」。
 
+## 2026-11-14
+
+### BUG-01 标签按钮重复渲染（已修复 ✅）
+- **现象**：冒烟测试 DOM 中 `#tag-options` 出现 8 个按钮（默认 4 个标签 ×2）。
+- **原因**：`renderSetup()` 与 `rebuildTagButtons()` 都在首次渲染时构建标签按钮；`renderSetup` 的 `if (!sp.children.length)` 守卫只罩住 species-options，tag-options 被两边各建一份。
+- **修复**：标签按钮只由 `rebuildTagButtons()` 构建，`renderSetup()` 只刷选中态。
+- **规则沉淀**：同一批 DOM 按钮**只允许一个构建者**；渲染函数只负责「按状态刷 selected 类」。
+
 ### BUG-02 ReferenceError: maxDepth is not defined（已修复 ✅）
 - **现象**：首页树不画。页面挂上错误可视化钩子后截图直接看到 `tree.js:85 ReferenceError`。
 - **原因**：`maxDepth` 是 `buildTree()` 的局部变量，`drawTree()` 里也引用了它。
