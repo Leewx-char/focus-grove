@@ -24,7 +24,13 @@ body {
 }
 
 /* ---- 视图切换 ---- */
-.view { display: none; min-height: calc(100vh - 64px - var(--safe-bottom)); flex-direction: column; padding: calc(var(--safe-top) + 8px) 16px 16px; }
+/* 100dvh：iOS Safari 工具栏收展会改变可视高度，100vh 比实际可视区高 → 底部内容被挡。
+   双写 fallback：不支持 dvh 的旧浏览器用 100vh。 */
+.view {
+  display: none; min-height: calc(100vh - 64px - var(--safe-bottom));
+  min-height: calc(100dvh - 64px - var(--safe-bottom));
+  flex-direction: column; padding: calc(var(--safe-top) + 8px) 16px 16px;
+}
 .view.active { display: flex; }
 
 /* ---- 顶栏 ---- */
@@ -35,7 +41,7 @@ body {
 
 /* ---- 种树主视图 ---- */
 #view-plant { position: relative; }
-.stage { position: relative; flex: 1; min-height: 46vh; }
+.stage { position: relative; flex: 1; min-height: clamp(200px, 38vh, 480px); }
 #tree-canvas { width: 100%; height: 100%; display: block; }
 .timer-display {
   position: absolute; top: 6%; left: 0; right: 0; text-align: center;
