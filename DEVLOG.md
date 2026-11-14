@@ -41,6 +41,19 @@
 - **规则沉淀**：移动端「底部元素被挡」三板斧：`100dvh` fallback、关键底部元素上方留 `padding-bottom: calc(tabbar + safe-area)`、用 `clamp()` 让弹性区（画布/地图）先收缩。**凡改了被 SW 缓存的资源，必须 bump 缓存版本号**。
 
 
+### BUG-07 自定义时长展开后底部又挡住了 → 布局架构改造（真机反馈，已修复 ✅）
+- **现象**：BUG-06 修好后，用户点「自定义」展开输入框行，内容总高再次超过视口，开关/按钮又被挡。逐项打补丁（压缩 stage）治标不治本——**任何可展开的内容都会复发**。
+- **根治**：按用户建议改为标准移动端布局——**tabbar 不再 fixed 悬浮，而是 body 纵向 flex 的底部成员；`.view` 成为独立滚动容器**：
+  ```css
+  body { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+  .view { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .tabbar { flex-shrink: 0; }  /* 移除 position: fixed */
+  ```
+- **关键陷阱**：`.view` 必须 `min-height: 0`——flex 子项默认 `min-height: auto`，会拒绝收缩到内容以下，`overflow-y: auto` 完全失效（内容撑破容器而不是出现滚动条）。这是 flex 布局最高频的坑之一。
+- **验证**：DOM 断言（`research/tools/cdp_test3.py`）：展开自定义后 `viewScrollable=true`、`tabbarTop == innerHeight - tabbarHeight`（精确占住底部）、滚动到底后 `fullyVisible=true`（按钮 bottom ≤ tabbar 顶）、自定义 1 分钟正常种植、0 JS 错误。430×932 截图确认展开态一屏完整呈现。**注意测试脚本不能盲选第一个 page target**——Edge 里残留 about:blank 时会连错页面（表现为所有元素 null；错误页标题是主机名也是线索：`document.title === "127.0.0.1"` 即 ERR_CONNECTION_REFUSED，那次其实是本地 http.server 挂了）。
+- **规则沉淀**：**「fixed 底栏 + body padding 预留」是脆弱模式**——任何动态内容增长都要逐个补丁；「flex 骨架 + 内容区独立滚动」一次到位。flex 子项要滚动必须 `min-height: 0`（纵向）/`min-width: 0`（横向）。
+
+
 ### 坑-01 浏览器后台节流 → 计时绝不能累加（设计时规避 ✅，测试证实）
 - 对策生效：测试中模拟拨回 `startedAt` 25 分钟，下一 tick 立即到期结算；前台每秒 tick 只读时间戳差（25:00→24:56 精确走动）。
 - **规则沉淀**：跨前后台的计时，**状态是时间戳，不是计数器**。
