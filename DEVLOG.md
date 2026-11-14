@@ -34,6 +34,13 @@
 - **修复**：bump 缓存版本 `focus-grove-v1 → v2`（activate 清旧缓存 + skipWaiting + clients.claim），第一次加载触发更新、第二次加载拿新代码，金币=2 ✅。
 - **规则沉淀**：**「改了代码但行为没变」时先怀疑 SW/HTTP 缓存**，再怀疑逻辑。迭代期可给静态资源 URL 加版本参数；发布期 bump SW 版本号是必须动作。
 
+### BUG-06 iPhone 上最底部按钮被挡住（真机反馈，已修复 ✅）
+- **现象**：用户真机反馈种树页最底部按钮被挡。
+- **原因**：① `.stage` `min-height: 46vh` + topbar + 六行设置面板 > iPhone 可视高度 → 设置面板整体溢出，按钮被 tabbar 挤出屏幕；② iOS Safari 的 `100vh` 包含工具栏区域（比可视高度大），`min-height: calc(100vh - …)` 在非 standalone 模式下进一步放大溢出。
+- **修复**：① `.stage` 改 `min-height: clamp(200px, 38vh, 480px)`——空间不足时先压缩树区而不是把按钮挤出去；② `.view` 双写 `100vh` → `100dvh` fallback（动态视口高度，Safari 工具栏收展自动适配）；③ 按坑-05 规则 bump SW `v2→v3`。
+- **规则沉淀**：移动端「底部元素被挡」三板斧：`100dvh` fallback、关键底部元素上方留 `padding-bottom: calc(tabbar + safe-area)`、用 `clamp()` 让弹性区（画布/地图）先收缩。**凡改了被 SW 缓存的资源，必须 bump 缓存版本号**。
+
+
 ### 坑-01 浏览器后台节流 → 计时绝不能累加（设计时规避 ✅，测试证实）
 - 对策生效：测试中模拟拨回 `startedAt` 25 分钟，下一 tick 立即到期结算；前台每秒 tick 只读时间戳差（25:00→24:56 精确走动）。
 - **规则沉淀**：跨前后台的计时，**状态是时间戳，不是计数器**。
