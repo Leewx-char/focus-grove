@@ -14,9 +14,15 @@
 - **验证**：回归测试全绿（滚动布局/种植交互不受影响）；430×932 截图确认橡树贴图形态与配色到位；SW bump `v4→v5` 并把 5 个 SVG 加入预缓存列表（SVG 也是静态资源，漏加会导致离线首访 404）。
 - **规则沉淀**：**「搜索素材」的正确产出往往不是素材本身，而是风格的精确参数化描述**——拿到风格特征后自绘 SVG 比强行套用不匹配的图标库素材更快更贴。SVG 手写扁平插画是低成本高可控的美术方案。
 
-## 2026-11-14
+### 名单交互升级：手动输入 → 预设应用勾选式选择器（用户反馈驱动）
+- **用户疑问**：为什么 Forest 能在应用内直接选应用，我们却要手动打字再去系统设置？
+- **平台解释（如实）**：Forest Android 用 `QUERY_ALL_PACKAGES` 枚举已装应用 + 无障碍服务监测前台——都是**只有原生 App 能拿的系统级权限**。网页沙箱在 iOS 上**没有任何 API 能枚举已安装应用**，更无法真拦截。PWA 名单的唯一作用 = 生成 iOS 专注模式配置指引。
+- **PWA 能做到的上限**：预设清单勾选式选择器——`BLOCKLIST_PRESETS`（国内常用 14 个 + 国际常用 10 个，名字与 iOS 专注模式 App 列表显示名一致），点选 chip 即加入/移出名单（`✓` 前缀标识选中态），清单外仍可手动添加并归入自定义分区（可删）。引导文案自动跟随名单变化。
+- **测试**：24 chips 渲染/分组/默认选中 ✓；toggle 抖音/Netflix 后 localStorage 与 UI 同步 ✓；自定义"Keep"入自定义区 ✓；`guideHasNetflix=true` ✓；0 JS 错误。SW bump `v5→v6`。
+- **真拦截的升级路径**（要"像 Forest 一样在应用内勾选 + 系统级屏蔽"只能做原生）：iOS 用 Screen Time API（FamilyControls + DeviceActivityShieldConfiguration），免费开发者账号可在 Xcode 启用 **Family Controls (Development) entitlement** 真机调试（分发才需付费申请）——即"有 Mac 无开发者账号"也能做出来，只是 7 天重签。列为后续选项。
+- **规则沉淀**：平台能力受限时，把「受限的能力」做成该平台下体验最好的形态（勾选代替打字），并明确告诉用户边界在哪、原生升级路径是什么——比静默降级或过度承诺都好。
 
-### BUG-01 标签按钮重复渲染（已修复 ✅）
+
 - **现象**：冒烟测试 DOM 中 `#tag-options` 出现 8 个按钮（默认 4 个标签 ×2）。
 - **原因**：`renderSetup()` 与 `rebuildTagButtons()` 都在首次渲染时构建标签按钮；`renderSetup` 的 `if (!sp.children.length)` 守卫只罩住 species-options，tag-options 被两边各建一份。
 - **修复**：标签按钮只由 `rebuildTagButtons()` 构建，`renderSetup()` 只刷选中态。
