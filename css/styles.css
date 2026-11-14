@@ -20,16 +20,24 @@ body {
   font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
   background: var(--bg); color: var(--text);
   touch-action: manipulation;
-  padding-bottom: calc(64px + var(--safe-bottom));
+  /* 页面骨架：纵向 flex = 可滚动内容区 + 固定 tabbar。
+     body 自身不滚动（overflow:hidden），滚动发生在 .view 内部，
+     tabbar 永远占住底部，内容不会被它遮挡。 */
+  display: flex; flex-direction: column;
+  height: 100vh;           /* fallback：不支持 dvh 的旧浏览器 */
+  height: 100dvh;          /* iOS Safari 工具栏收展自适应 */
+  overflow: hidden;
 }
 
-/* ---- 视图切换 ---- */
-/* 100dvh：iOS Safari 工具栏收展会改变可视高度，100vh 比实际可视区高 → 底部内容被挡。
-   双写 fallback：不支持 dvh 的旧浏览器用 100vh。 */
+/* ---- 视图切换：每个视图是独立的滚动容器 ---- */
 .view {
-  display: none; min-height: calc(100vh - 64px - var(--safe-bottom));
-  min-height: calc(100dvh - 64px - var(--safe-bottom));
-  flex-direction: column; padding: calc(var(--safe-top) + 8px) 16px 16px;
+  display: none;
+  flex: 1 1 auto;
+  min-height: 0;    /* 关键：flex 子项默认 min-height:auto 会拒绝收缩，导致 overflow 失效 */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex-direction: column;
+  padding: calc(var(--safe-top) + 8px) 16px 16px;
 }
 .view.active { display: flex; }
 
@@ -146,9 +154,9 @@ body {
 .dialog-actions { display: flex; flex-direction: column; gap: 8px; }
 .result-emoji { font-size: 56px; }
 
-/* ---- 底部 Tab ---- */
+/* ---- 底部 Tab：文档流内固定高度（body flex 骨架的底部成员），不悬浮、不遮挡 ---- */
 .tabbar {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  flex-shrink: 0;
   display: flex; background: var(--card); border-top: 1px solid #e2e8e3;
   padding-bottom: var(--safe-bottom); height: calc(64px + var(--safe-bottom));
 }
