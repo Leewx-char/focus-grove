@@ -3,6 +3,8 @@
 Forest 核心机制的原创复刻（Web 版）：**计时器、种树动画、应用限制名单、专注统计、专注期拦截**。
 全部代码与美术为原创实现，机制规则参考自逆向分析（见 `../research/` 与 `SPEC.md`），未复制 Forest 任何资源。
 
+**📱 线上地址（iPhone 直接访问安装）：https://leewx-char.github.io/focus-grove/**
+
 ## 运行（本地）
 
 ```bash
