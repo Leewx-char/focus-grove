@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#3a7d56">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Focus Grove">
+<title>Focus Grove · 专注种树</title>
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- 开发诊断：把 JS 错误直接画到页面（截图即可见），发布前移除 -->
+<script>
+window.__errs = [];
+window.addEventListener('error', e => {
+  const msg = (e.error && e.error.stack) || e.message || String(e.error);
+  window.__errs.push(msg);
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;bottom:70px;left:8px;right:8px;max-height:40vh;overflow:auto;background:#ffe9e9;color:#8a1f1f;font:11px/1.4 monospace;padding:8px;border-radius:8px;z-index:9999;white-space:pre-wrap';
+  d.textContent = 'ERR: ' + msg;
+  document.body.appendChild(d);
+});
+</script>
+
+<!-- 主视图：种树 -->
+<section id="view-plant" class="view active">
+  <header class="topbar">
+    <div class="stat-chip" id="chip-today">今日 0 分钟</div>
+    <div class="stat-chip coin-chip" id="chip-coins">🪙 0</div>
+  </header>
+
+  <div class="stage">
+    <canvas id="tree-canvas"></canvas>
+    <div id="grace-banner" class="grace-banner hidden">
+      小树在等你回来！<span id="grace-count">10</span> 秒后枯萎
+    </div>
+    <div id="timer-display" class="timer-display">25:00</div>
+    <div id="progress-ring-label" class="progress-label">准备好了就种下这棵树</div>
+  </div>
+
+  <div id="setup-panel" class="setup-panel">
+    <div class="row">
+      <label>时长</label>
+      <div class="durations" id="duration-options">
+        <button data-sec="900">15</button>
+        <button data-sec="1500" class="sel">25</button>
+        <button data-sec="1800">30</button>
+        <button data-sec="2700">45</button>
+        <button data-sec="3600">60</button>
+        <button data-sec="0">自定义</button>
+      </div>
+      <div class="row custom-row hidden" id="custom-duration-row">
+        <input id="custom-minutes" type="number" inputmode="numeric" min="1" max="180" placeholder="分钟数 (1-180)">
+      </div>
+    </div>
+    <div class="row">
+      <label>模式</label>
+      <div class="modes" id="mode-options">
+        <button data-mode="countdown" class="sel">倒计时</button>
+        <button data-mode="countup">正计时</button>
+      </div>
+    </div>
+    <div class="row">
+      <label>树种</label>
+      <div class="species" id="species-options"></div>
+    </div>
+    <div class="row">
+      <label>标签</label>
+      <div class="tags" id="tag-options"></div>
+    </div>
+    <div class="row toggle-row">
+      <label>深度专注（开启屏蔽引导）</label>
+      <button id="deep-focus-toggle" class="toggle on" aria-pressed="true"></button>
+    </div>
+    <button id="plant-btn" class="primary-btn">种下这棵树 🌱</button>
+  </div>
+
+  <div id="growing-panel" class="growing-panel hidden">
+    <div class="growing-tip" id="growing-tip">保持在这个页面，树会长得更好</div>
+    <button id="giveup-btn" class="danger-btn">放弃（树会枯萎）</button>
+    <button id="finish-countup-btn" class="primary-btn hidden">完成 ✓</button>
+  </div>
+</section>
+
+<!-- 森林视图 -->
+<section id="view-forest" class="view">
+  <header class="topbar"><h2>我的森林</h2><div class="stat-chip" id="forest-count">0 棵</div></header>
+  <div class="forest-grid" id="forest-grid"></div>
+  <div id="forest-empty" class="empty-hint">种下第一棵树吧 🌱</div>
+</section>
+
+<!-- 统计视图 -->
+<section id="view-stats" class="view">
+  <header class="topbar"><h2>专注统计</h2></header>
+  <div class="stats-cards">
+    <div class="card"><div class="card-num" id="stat-today">0m</div><div class="card-label">今日专注</div></div>
+    <div class="card"><div class="card-num" id="stat-total">0h</div><div class="card-label">累计专注</div></div>
+    <div class="card"><div class="card-num" id="stat-count">0</div><div class="card-label">完成棵数</div></div>
+  </div>
+  <div class="card week-card"><h3>最近 7 天</h3><canvas id="week-chart"></canvas></div>
+  <div class="card"><h3>成就</h3><div id="achievement-list"></div></div>
+  <div class="card"><h3>标签分布（今日）</h3><div id="tag-breakdown" class="tag-breakdown"></div></div>
+</section>
+
+<!-- 名单/设置视图 -->
+<section id="view-settings" class="view">
+  <header class="topbar"><h2>限制名单与设置</h2></header>
+  <div class="card">
+    <h3>想屏蔽的应用</h3>
+    <p class="hint">iOS 网页无法直接拦截其他 App。把这些 App 加入名单后，按引导在系统「专注模式」里屏蔽它们。</p>
+    <div class="add-row">
+      <input id="blocklist-input" type="text" placeholder="应用名称，如：抖音">
+      <button id="blocklist-add" class="small-btn">添加</button>
+    </div>
+    <div id="blocklist-items" class="chip-list"></div>
+  </div>
+  <div class="card">
+    <h3>iOS 专注模式引导</h3>
+    <ol id="focus-guide" class="guide"></ol>
+  </div>
+  <div class="card">
+    <h3>离开宽限</h3>
+    <p class="hint">深度专注时切走本页面，超过宽限时间树会枯萎（对应 Forest 的 KILL_APP 规则）。</p>
+    <div class="add-row">
+      <input id="grace-input" type="number" inputmode="numeric" min="0" max="120" placeholder="秒">
+      <button id="grace-save" class="small-btn">保存</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>标签管理</h3>
+    <div class="add-row">
+      <input id="tag-input" type="text" placeholder="新标签名">
+      <button id="tag-add" class="small-btn">添加</button>
+    </div>
+    <div id="tag-manage-list" class="chip-list"></div>
+  </div>
+</section>
+
+<!-- 全屏遮罩：深度专注（对应 Forest 的 overlay） -->
+<div id="focus-overlay" class="focus-overlay hidden">
+  <div class="overlay-inner">
+    <div class="overlay-tree">🌲</div>
+    <h2>深度专注中</h2>
+    <p>你的小树正在生长。<br>回到专注页面继续吧！</p>
+    <button id="overlay-back" class="primary-btn">返回种树 🌱</button>
+  </div>
+</div>
+
+<!-- 确认弹窗（放弃等） -->
+<div id="confirm-dialog" class="dialog hidden">
+  <div class="dialog-box">
+    <h3 id="confirm-title">确定吗？</h3>
+    <p id="confirm-text"></p>
+    <div class="dialog-actions">
+      <button id="confirm-cancel" class="small-btn">继续专注</button>
+      <button id="confirm-ok" class="danger-btn">放弃并枯萎</button>
+    </div>
+  </div>
+</div>
+
+<!-- 结算弹窗 -->
+<div id="result-dialog" class="dialog hidden">
+  <div class="dialog-box">
+    <div id="result-emoji" class="result-emoji">🌳</div>
+    <h3 id="result-title">种树成功！</h3>
+    <p id="result-text"></p>
+    <div class="dialog-actions">
+      <button id="result-ok" class="primary-btn">好的</button>
+    </div>
+  </div>
+</div>
+
+<nav class="tabbar">
+  <button data-view="plant" class="sel">🌱 种树</button>
+  <button data-view="forest">🌳 森林</button>
+  <button data-view="stats">📊 统计</button>
+  <button data-view="settings">⚙️ 名单</button>
+</nav>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

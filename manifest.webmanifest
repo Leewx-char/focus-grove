@@ -1,0 +1,16 @@
+{
+  "name": "Focus Grove · 专注种树",
+  "short_name": "Focus Grove",
+  "description": "专注时种下一棵树，离开就枯萎。计时器、森林、限制名单与专注统计。",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef4ec",
+  "theme_color": "#3a7d56",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
