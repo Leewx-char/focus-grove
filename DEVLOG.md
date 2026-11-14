@@ -3,6 +3,17 @@
 > 一边写一边记。每条含：现象 → 原因 → 修复 → 规则沉淀。
 > 测试环境：Windows + headless Edge 157（CDP 9223）+ python http.server:8788，驱动脚本 `research/tools/cdp_test*.py`。
 
+## 2026-11-15
+
+### 美术改造：程序化分形树 → Forest 风格原创 SVG 静态贴图（用户反馈驱动）
+- **需求**：程序化树太简陋；参考 Forest 树木风格；计时中不需要成长动画，只要静态贴图。
+- **素材搜索结论**（先搜后画）：免费素材库与 Forest 插画风不匹配——SVG Repo 的树是 16×16 单色剪影图标（单 path，无分层无色彩），Openclipart/图库站要么风格不符要么许可受限（Freepik 需署名且条件多、iStock/Dreamstime 付费）。Forest 官方贴图是版权资产，**绝不能 rip**。
+- **决策**：参考搜索确认的风格特征（层叠圆冠、径向渐变、短粗树干、高光斑、地面阴影），**自绘 5 张原创 SVG**（`assets/tree-{oak,sakura,pine,maple,wisteria}.svg`，200×240）。松树用「同色粗描边 + round join」技巧做圆角三层锥；樱花加花点、紫藤加垂挂花串、枫树加飘叶。
+- **架构简化**：`tree.js` 从 200 行 Canvas 分形引擎缩成 15 行贴图模块（`treeSrc/treeName`）；删除 rAF 动画循环与 resize 重绘；`canvas → <img object-fit:contain>`；枯树 = 同一张贴图 + CSS `filter: grayscale(.85) brightness(.72) sepia(.4)`（绿转灰褐，一张图两种状态）。
+- **状态机**：`idle`（种植前预览，opacity .55 + saturate .55）→ `growing`（全彩静态）→ `dead`（枯树滤镜）。
+- **验证**：回归测试全绿（滚动布局/种植交互不受影响）；430×932 截图确认橡树贴图形态与配色到位；SW bump `v4→v5` 并把 5 个 SVG 加入预缓存列表（SVG 也是静态资源，漏加会导致离线首访 404）。
+- **规则沉淀**：**「搜索素材」的正确产出往往不是素材本身，而是风格的精确参数化描述**——拿到风格特征后自绘 SVG 比强行套用不匹配的图标库素材更快更贴。SVG 手写扁平插画是低成本高可控的美术方案。
+
 ## 2026-11-14
 
 ### BUG-01 标签按钮重复渲染（已修复 ✅）
