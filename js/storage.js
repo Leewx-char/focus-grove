@@ -12,7 +12,7 @@ const KEYS = {
 };
 
 const DEFAULT_SETTINGS = {
-  blocklist: ['微信', '抖音', '微博', '小红书', 'B站'], // 展示名列表（引导 iOS 专注模式用）
+  blocklist: ['微信', '抖音', '小红书', '微博', '哔哩哔哩'], // 预设勾选的默认名单
   tags: ['专注', '学习', '工作', '阅读'],
   graceSeconds: 10,             // 专注中离开页面的宽限秒数
   deepFocusDefault: true,       // 开启种树时默认进入深度专注

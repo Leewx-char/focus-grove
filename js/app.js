@@ -3,7 +3,7 @@ import { Storage } from './storage.js';
 import { TimerEngine, DIE } from './timer.js';
 import { TREE_TYPES, treeSrc, treeName } from './tree.js';
 import { Stats } from './stats.js';
-import { Blocklist } from './blocklist.js';
+import { Blocklist, BLOCKLIST_PRESETS } from './blocklist.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -342,16 +342,42 @@ function renderStats() {
 
 /* ---------- 名单/设置视图 ---------- */
 function renderSettings() {
-  // 名单 chips
+  // 预设应用勾选网格（点选即加入/移出名单）
+  const groups = $('preset-groups');
+  groups.innerHTML = '';
+  for (const [groupName, apps] of Object.entries(BLOCKLIST_PRESETS)) {
+    const g = document.createElement('div');
+    g.className = 'preset-group';
+    const h = document.createElement('h4');
+    h.textContent = groupName;
+    g.appendChild(h);
+    const grid = document.createElement('div');
+    grid.className = 'preset-grid';
+    apps.forEach(name => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'preset-chip' + (Blocklist.has(name) ? ' sel' : '');
+      chip.textContent = name;
+      chip.setAttribute('aria-pressed', String(Blocklist.has(name)));
+      chip.addEventListener('click', () => { Blocklist.toggle(name); renderSettings(); });
+      grid.appendChild(chip);
+    });
+    g.appendChild(grid);
+    groups.appendChild(g);
+  }
+  // 清单外的自定义应用 chips（可删除）
   const wrap = $('blocklist-items');
   wrap.innerHTML = '';
-  Blocklist.list().forEach(name => {
-    const item = document.createElement('span');
-    item.className = 'chip-item';
-    item.innerHTML = `${name}<button aria-label="移除">✕</button>`;
-    item.querySelector('button').addEventListener('click', () => { Blocklist.remove(name); renderSettings(); });
-    wrap.appendChild(item);
-  });
+  const customs = Blocklist.customItems();
+  if (customs.length) {
+    customs.forEach(name => {
+      const item = document.createElement('span');
+      item.className = 'chip-item';
+      item.innerHTML = `${name}<button aria-label="移除">✕</button>`;
+      item.querySelector('button').addEventListener('click', () => { Blocklist.remove(name); renderSettings(); });
+      wrap.appendChild(item);
+    });
+  }
   // 引导
   const guide = $('focus-guide');
   guide.innerHTML = '';

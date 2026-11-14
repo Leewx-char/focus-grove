@@ -136,6 +136,18 @@ body {
 .chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip-item { background: #e2efe6; border-radius: 999px; padding: 6px 10px 6px 14px; font-size: 13.5px; display: flex; align-items: center; gap: 6px; }
 .chip-item button { border: none; background: transparent; color: var(--danger); font-size: 14px; cursor: pointer; padding: 0 2px; }
+/* 预设应用勾选网格 */
+.preset-group { margin-bottom: 10px; }
+.preset-group h4 { margin: 6px 0; font-size: 13px; color: var(--muted); font-weight: 600; }
+.preset-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.preset-chip {
+  border: 1.5px solid #cfdcd2; background: var(--card); color: var(--text);
+  border-radius: 999px; padding: 7px 13px; font-size: 13.5px; cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.preset-chip.sel { border-color: var(--primary); background: #e2efe6; color: var(--primary-dark); font-weight: 600; }
+.preset-chip::before { content: '✓ '; color: var(--primary); font-weight: 700; visibility: hidden; }
+.preset-chip.sel::before { visibility: visible; }
 .guide { margin: 0; padding-left: 18px; font-size: 13.5px; line-height: 1.7; color: var(--text); }
 .guide li { margin-bottom: 6px; }
 

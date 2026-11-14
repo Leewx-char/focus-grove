@@ -112,9 +112,10 @@ window.addEventListener('error', e => {
   <header class="topbar"><h2>限制名单与设置</h2></header>
   <div class="card">
     <h3>想屏蔽的应用</h3>
-    <p class="hint">iOS 网页无法直接拦截其他 App。把这些 App 加入名单后，按引导在系统「专注模式」里屏蔽它们。</p>
+    <p class="hint">网页无法读取手机已装应用，也无法直接拦截——从下面勾选后，按引导在 iOS「专注模式」里屏蔽它们（名单名与系统显示名一致，照配即可）。</p>
+    <div id="preset-groups"></div>
     <div class="add-row">
-      <input id="blocklist-input" type="text" placeholder="应用名称，如：抖音">
+      <input id="blocklist-input" type="text" placeholder="清单外的应用，手动添加">
       <button id="blocklist-add" class="small-btn">添加</button>
     </div>
     <div id="blocklist-items" class="chip-list"></div>
